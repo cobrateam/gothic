@@ -79,3 +79,13 @@ func TestGenerateUpdateFromStruct(t *testing.T) {
 		t.Errorf(`UPDATE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
+
+func TestMultipleFilterUpdateFromStructure(t *testing.T) {
+	p := Person{Id: 1, Name: "Umi", Age: 6}
+	expected := `update person age=6 where id=1 and name="Umi"`
+	got := Update(p, []string{"age"}, []string{"id", "name"})
+
+	if expected != got {
+		t.Errorf(`UPDATE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+	}
+}
