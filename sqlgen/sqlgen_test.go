@@ -2,18 +2,26 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package sqlgen_test
+package sqlgen
 
 import (
 	"reflect"
 	"testing"
-	. "github.com/cobrateam/gothic/sqlgen"
 )
 
 type Person struct {
 	Id   int
 	Name string
 	Age  int
+}
+
+func TestFieldNames(t *testing.T) {
+	var p Person
+	expected := []string{"Name", "Age"}
+	got := fieldNames(reflect.TypeOf(p))
+	if !reflect.DeepEqual(expected, got) {
+		t.Errorf("Expected %q. Got %q.", expected, got)
+	}
 }
 
 func TestGenerateSelectFromStruct(t *testing.T) {

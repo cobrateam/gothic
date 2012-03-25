@@ -12,7 +12,7 @@ import (
 
 func Select(obj interface{}) string {
 	t := reflect.TypeOf(obj)
-	fieldNames := FieldNames(t)
+	fieldNames := fieldNames(t)
 
 	sql := fmt.Sprintf("select %s from %s", strings.Join(fieldNames, ", "), t.Name())
 	return strings.ToLower(sql)
@@ -20,7 +20,7 @@ func Select(obj interface{}) string {
 
 func Insert(obj interface{}) string {
 	t := reflect.TypeOf(obj)
-	fieldNames := FieldNames(t)
+	fieldNames := fieldNames(t)
 
 	qm := make([]string, len(fieldNames))
 	for i := 0; i < len(qm); i++ {
@@ -39,8 +39,8 @@ func Update(obj interface{}, uFields, fFields []string) string {
 	t := reflect.TypeOf(obj)
 	s := reflect.ValueOf(obj)
 
-	fieldsAndValues := FieldValues(s, uFields)
-	filters := FieldValues(s, fFields)
+	fieldsAndValues := fieldValues(s, uFields)
+	filters := fieldValues(s, fFields)
 
 	sql := fmt.Sprintf("update %s %s where %s", strings.ToLower(t.Name()), strings.Join(fieldsAndValues, ", "), strings.Join(filters, ", "))
 
@@ -50,7 +50,7 @@ func Update(obj interface{}, uFields, fFields []string) string {
 // Receives a reflect.Value and the fields you want form the struct
 // returns the respective values from the fields passed in the form of
 // field=value, if value is a string, add " around it
-func FieldValues(s reflect.Value, fields []string) []string {
+func fieldValues(s reflect.Value, fields []string) []string {
 	fieldValues := make([]string, len(fields))
 
 	for i, v := range fields {
@@ -68,11 +68,11 @@ func FieldValues(s reflect.Value, fields []string) []string {
 	return fieldValues
 }
 
-func FieldNames(t reflect.Type) []string {
-	fieldNames := []string{}
+func fieldNames(t reflect.Type) []string {
+	fieldNames := make([]string, t.NumField())
 
 	for i := 0; i < t.NumField(); i++ {
-		fieldNames = append(fieldNames, t.Field(i).Name)
+		fieldNames[i] = t.Field(i).Name
 	}
 
 	return fieldNames

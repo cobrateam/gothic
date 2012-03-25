@@ -1,0 +1,18 @@
+gothic
+
+Experimental database abstraction layer for Go. Works with last weekly (Go 1 RC2).
+
+Collaborate
+
+Make sure you set your GOPATH environment variable [1], then run:
+
+    % mkdir -p ${GOPATH}/src/github.com/cobrateam/
+    % cd ${GOPATH}/src/github.com/cobrateam
+    % git clone <your-clone-url>
+
+After cloning, you can use the go tool to run tests:
+
+    % cd ${GOPATH}/src/github.com/cobrateam/gothic
+    % go test ./...
+
+[1] http://weekly.golang.org/cmd/go/#GOPATH_environment_variable
