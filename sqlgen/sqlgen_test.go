@@ -61,6 +61,15 @@ func TestSimpleDeleteFromStruct(t *testing.T) {
 	}
 }
 
+func TestMultipleFilterDeleteFromStruct(t *testing.T) {
+	p := Person{"Chuck", 32}
+	expected := "delete from person where name = Chuck and age = 32"
+	got := Delete(p, []string{"Name", "Age"})
+	if expected != got {
+		t.Errorf(`DELETE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+	}
+}
+
 func TestGenerateUpdateFromStruct(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
 	expected := `update person name="Umi", age=6 where id=1`
