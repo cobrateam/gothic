@@ -12,7 +12,7 @@ import (
 
 type Person struct {
 	Name string
-	Age int
+	Age  int
 }
 
 func TestGenerateSelectFromStruct(t *testing.T) {
