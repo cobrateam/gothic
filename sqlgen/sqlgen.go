@@ -22,7 +22,7 @@ func Insert(obj interface{}) string {
 	t := reflect.TypeOf(obj)
 	fieldNames := fieldNames(t)
 
-	qm := make([]string, len(fieldNames)) // supply the question marks for the sql stmt
+	qm := make([]string, len(fieldNames))
 	for i := 0; i < len(qm); i++ {
 		qm[i] = "?"
 	}
@@ -39,6 +39,43 @@ func Delete(obj interface{}, filters []string) string {
 	sql = strings.ToLower(sql)
 	sql = fmt.Sprintf(sql + "%s", v.FieldByName(filters[0]))
 	return sql
+}
+
+// obj is the struct to be updated in the database
+// uFields are the fields that are gonna be update
+// fFields are the fields that are gonna be used as filter
+// to the where clause
+func Update(obj interface{}, uFields, fFields []string) string {
+	t := reflect.TypeOf(obj)
+	s := reflect.ValueOf(obj)
+
+	fieldsAndValues := fieldValues(s, uFields)
+	filters := fieldValues(s, fFields)
+
+	sql := fmt.Sprintf("update %s %s where %s", strings.ToLower(t.Name()), strings.Join(fieldsAndValues, ", "), strings.Join(filters, ", "))
+
+	return sql
+}
+
+// Receives a reflect.Value and the fields you want form the struct
+// returns the respective values from the fields passed in the form of
+// field=value, if value is a string, add " around it
+func fieldValues(s reflect.Value, fields []string) []string {
+	fieldValues := make([]string, len(fields))
+
+	for i, v := range fields {
+		f := s.FieldByName(strings.Title(v))
+
+		var stmt string
+		if f.Type().Kind() == reflect.String {
+			stmt = fmt.Sprintf(`%s="%v"`, strings.ToLower(v), f.Interface())
+		} else {
+			stmt = fmt.Sprintf("%s=%v", strings.ToLower(v), f.Interface())
+		}
+		fieldValues[i] = stmt
+	}
+
+	return fieldValues
 }
 
 func fieldNames(t reflect.Type) []string {
