@@ -12,7 +12,7 @@ import (
 
 func Select(obj interface{}) string {
 	t := reflect.TypeOf(obj)
-	fieldNames := FieldNames(t)
+	fieldNames := fieldNames(t)
 
 	sql := fmt.Sprintf("select %s from %s", strings.Join(fieldNames, ", "), t.Name())
 	return strings.ToLower(sql)
@@ -20,7 +20,7 @@ func Select(obj interface{}) string {
 
 func Insert(obj interface{}) string {
 	t := reflect.TypeOf(obj)
-	fieldNames := FieldNames(t)
+	fieldNames := fieldNames(t)
 
 	qm := make([]string, len(fieldNames)) // supply the question marks for the sql stmt
 	for i := 0; i < len(qm); i++ {
@@ -31,7 +31,7 @@ func Insert(obj interface{}) string {
 	return strings.ToLower(sql)
 }
 
-func FieldNames(t reflect.Type) []string {
+func fieldNames(t reflect.Type) []string {
 	fieldNames := []string{}
 
 	for i := 0; i < t.NumField(); i++ {
