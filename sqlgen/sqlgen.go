@@ -31,6 +31,16 @@ func Insert(obj interface{}) string {
 	return strings.ToLower(sql)
 }
 
+func Delete(obj interface{}, filters []string) string {
+	t := reflect.TypeOf(obj)
+	v := reflect.ValueOf(obj)
+
+	sql := fmt.Sprintf("delete from %s where %s = ", t.Name(), filters[0])
+	sql = strings.ToLower(sql)
+	sql = fmt.Sprintf(sql + "%s", v.FieldByName(filters[0]))
+	return sql
+}
+
 func fieldNames(t reflect.Type) []string {
 	fieldNames := make([]string, t.NumField())
 
