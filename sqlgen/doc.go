@@ -23,6 +23,9 @@
 		var p Person
 		sql := sqlgen.Select(p)
 
-	This will generate: select name, age from person.
+	This would generate:
+
+		select name, age from person
+
 */
 package sqlgen
