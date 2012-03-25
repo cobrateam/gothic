@@ -35,9 +35,12 @@ func Delete(obj interface{}, filters []string) string {
 	t := reflect.TypeOf(obj)
 	v := reflect.ValueOf(obj)
 
-	sql := fmt.Sprintf("delete from %s where %s = ", t.Name(), filters[0])
+	filter_array := fieldValues(v, filters)
+	filter_sql := strings.Join(filter_array, " and ")
+
+	sql := fmt.Sprintf("delete from %s where ", t.Name())
 	sql = strings.ToLower(sql)
-	sql = fmt.Sprintf(sql + "%s", v.FieldByName(filters[0]))
+	sql = sql + filter_sql
 	return sql
 }
 
