@@ -12,11 +12,31 @@ import (
 
 func Select(obj interface{}) string {
 	t := reflect.TypeOf(obj)
+	fieldNames := FieldNames(t)
+
+	sql := fmt.Sprintf("select %s from %s", strings.Join(fieldNames, ", "), t.Name())
+	return strings.ToLower(sql)
+}
+
+func Insert(obj interface{}) string {
+	t := reflect.TypeOf(obj)
+	fieldNames := FieldNames(t)
+
+	qm := make([]string, len(fieldNames)) // supply the question marks for the sql stmt
+	for i := 0; i < len(qm); i++ {
+		qm[i] = "?"
+	}
+
+	sql := fmt.Sprintf("insert into %s (%s) values (%s)", t.Name(), strings.Join(fieldNames, ", "), strings.Join(qm, ", "))
+	return strings.ToLower(sql)
+}
+
+func FieldNames(t reflect.Type) ([]string) {
 	fieldNames := []string{}
+
 	for i := 0; i < t.NumField(); i++ {
 		fieldNames = append(fieldNames, t.Field(i).Name)
 	}
 
-	sql := fmt.Sprintf("select %s from %s", strings.Join(fieldNames, ", "), t.Name())
-	return strings.ToLower(sql)
+	return fieldNames
 }
