@@ -32,10 +32,10 @@ func Insert(obj interface{}) string {
 }
 
 func fieldNames(t reflect.Type) []string {
-	fieldNames := []string{}
+	fieldNames := make([]string, t.NumField())
 
 	for i := 0; i < t.NumField(); i++ {
-		fieldNames = append(fieldNames, t.Field(i).Name)
+		fieldNames[i] = t.Field(i).Name
 	}
 
 	return fieldNames
