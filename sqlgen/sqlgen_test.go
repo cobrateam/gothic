@@ -72,7 +72,7 @@ func TestMultipleFilterDeleteFromStruct(t *testing.T) {
 
 func TestGenerateUpdateFromStruct(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
-	expected := `update person name="Umi", age=6 where id=1`
+	expected := `update person set name="Umi", age=6 where id=1`
 	got := Update(p, []string{"name", "age"}, []string{"id"})
 
 	if expected != got {
@@ -82,7 +82,7 @@ func TestGenerateUpdateFromStruct(t *testing.T) {
 
 func TestMultipleFilterUpdateFromStructure(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
-	expected := `update person age=6 where id=1 and name="Umi"`
+	expected := `update person set age=6 where id=1 and name="Umi"`
 	got := Update(p, []string{"age"}, []string{"id", "name"})
 
 	if expected != got {

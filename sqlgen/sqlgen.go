@@ -55,7 +55,7 @@ func Update(obj interface{}, uFields, fFields []string) string {
 	fieldsAndValues := fieldValues(s, uFields)
 	filters := fieldValues(s, fFields)
 
-	sql := fmt.Sprintf("update %s %s where %s", strings.ToLower(t.Name()), strings.Join(fieldsAndValues, ", "), strings.Join(filters, " and "))
+	sql := fmt.Sprintf("update %s set %s where %s", strings.ToLower(t.Name()), strings.Join(fieldsAndValues, ", "), strings.Join(filters, " and "))
 
 	return sql
 }
