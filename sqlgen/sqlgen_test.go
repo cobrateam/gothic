@@ -17,8 +17,18 @@ type Person struct {
 
 func TestFieldNames(t *testing.T) {
 	var p Person
-	expected := []string{"Name", "Age"}
+	expected := []string{"Id", "Name", "Age"}
 	got := fieldNames(reflect.TypeOf(p))
+	if !reflect.DeepEqual(expected, got) {
+		t.Errorf("Expected %q. Got %q.", expected, got)
+	}
+}
+
+func TestFieldValues(t *testing.T) {
+	p := Person{Id: 1, Name: "Umi", Age: 6}
+	expected := []string{"id=1", `name="Umi"`, "age=6"}
+	got := fieldValues(reflect.ValueOf(p), []string{"id", "name", "age"})
+
 	if !reflect.DeepEqual(expected, got) {
 		t.Errorf("Expected %q. Got %q.", expected, got)
 	}
