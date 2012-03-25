@@ -62,7 +62,7 @@ func TestSimpleDeleteFromStruct(t *testing.T) {
 }
 
 func TestMultipleFilterDeleteFromStruct(t *testing.T) {
-	p := Person{"Chuck", 32}
+	p := Person{1, "Chuck", 32}
 	expected := "delete from person where name = Chuck and age = 32"
 	got := Delete(p, []string{"Name", "Age"})
 	if expected != got {
