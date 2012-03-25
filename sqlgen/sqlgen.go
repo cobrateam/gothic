@@ -31,7 +31,7 @@ func Insert(obj interface{}) string {
 	return strings.ToLower(sql)
 }
 
-func FieldNames(t reflect.Type) ([]string) {
+func FieldNames(t reflect.Type) []string {
 	fieldNames := []string{}
 
 	for i := 0; i < t.NumField(); i++ {
