@@ -11,7 +11,7 @@ import (
 )
 
 func Select(obj interface{}, args...[]string) string {
-	t := reflect.TypeOf(obj)
+	t := reflect.TypeOf(obj).Elem()
 	var sql string
 
 	if len(args) != 0 {
@@ -25,7 +25,7 @@ func Select(obj interface{}, args...[]string) string {
 }
 
 func Insert(obj interface{}) string {
-	t := reflect.TypeOf(obj)
+	t := reflect.TypeOf(obj).Elem()
 	fieldNames := fieldNames(t)
 
 	qm := make([]string, len(fieldNames))
@@ -38,7 +38,7 @@ func Insert(obj interface{}) string {
 }
 
 func Delete(obj interface{}, filters []string) string {
-	t := reflect.TypeOf(obj)
+	t := reflect.TypeOf(obj).Elem()
 
 	filter_array := preparedFields(filters)
 	filter_sql := strings.Join(filter_array, " and ")
@@ -54,7 +54,7 @@ func Delete(obj interface{}, filters []string) string {
 // fFields are the fields that are gonna be used as filter
 // to the where clause
 func Update(obj interface{}, uFields, fFields []string) string {
-	t := reflect.TypeOf(obj)
+	t := reflect.TypeOf(obj).Elem()
 
 	fieldsAndValues := preparedFields(uFields)
 	filters := preparedFields(fFields)

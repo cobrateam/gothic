@@ -36,7 +36,7 @@ func TestPrepraredFields(t *testing.T) {
 func TestGenerateSelectAllFieldsFromStruct(t *testing.T) {
 	var p Person
 	expected := "select id, name, age from person"
-	got := Select(p)
+	got := Select(&p)
 	if expected != got {
 		t.Errorf(`SELECT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
@@ -45,7 +45,7 @@ func TestGenerateSelectAllFieldsFromStruct(t *testing.T) {
 func TestSelectOneFieldFromStruct(t *testing.T) {
 	var p Person
 	expected := "select name from person"
-	got := Select(p, []string{"name"})
+	got := Select(&p, []string{"name"})
 
 	if expected != got {
 		t.Errorf(`SELECT generation for %q. Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
@@ -55,7 +55,7 @@ func TestSelectOneFieldFromStruct(t *testing.T) {
 func TestGenerateInsertFromStruct(t *testing.T) {
 	var p Person
 	expected := "insert into person (id, name, age) values (?, ?, ?)"
-	got := Insert(p)
+	got := Insert(&p)
 	if expected != got {
 		t.Errorf(`INSERT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
@@ -64,7 +64,7 @@ func TestGenerateInsertFromStruct(t *testing.T) {
 func TestSimpleDeleteFromStruct(t *testing.T) {
 	p := Person{1, "Chuck", 32}
 	expected := "delete from person where name=?"
-	got := Delete(p, []string{"Name"})
+	got := Delete(&p, []string{"Name"})
 	if expected != got {
 		t.Errorf(`DELETE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
@@ -73,7 +73,7 @@ func TestSimpleDeleteFromStruct(t *testing.T) {
 func TestMultipleFilterDeleteFromStruct(t *testing.T) {
 	p := Person{1, "Chuck", 32}
 	expected := "delete from person where name=? and age=?"
-	got := Delete(p, []string{"Name", "Age"})
+	got := Delete(&p, []string{"Name", "Age"})
 	if expected != got {
 		t.Errorf(`DELETE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
@@ -82,7 +82,7 @@ func TestMultipleFilterDeleteFromStruct(t *testing.T) {
 func TestGenerateUpdateFromStruct(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
 	expected := "update person set name=?, age=? where id=?"
-	got := Update(p, []string{"name", "age"}, []string{"id"})
+	got := Update(&p, []string{"name", "age"}, []string{"id"})
 
 	if expected != got {
 		t.Errorf(`UPDATE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
@@ -92,7 +92,7 @@ func TestGenerateUpdateFromStruct(t *testing.T) {
 func TestMultipleFilterUpdateFromStructure(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
 	expected := "update person set age=? where id=? and name=?"
-	got := Update(p, []string{"age"}, []string{"id", "name"})
+	got := Update(&p, []string{"age"}, []string{"id", "name"})
 
 	if expected != got {
 		t.Errorf(`UPDATE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
