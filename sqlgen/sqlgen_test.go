@@ -24,10 +24,9 @@ func TestFieldNames(t *testing.T) {
 	}
 }
 
-func TestFieldValues(t *testing.T) {
-	p := Person{Id: 1, Name: "Umi", Age: 6}
-	expected := []string{"id=1", `name="Umi"`, "age=6"}
-	got := fieldValues(reflect.ValueOf(p), []string{"id", "name", "age"})
+func TestPrepraredFields(t *testing.T) {
+	expected := []string{"id=?", "name=?", "age=?"}
+	got := preparedFields([]string{"id", "name", "age"})
 
 	if !reflect.DeepEqual(expected, got) {
 		t.Errorf("Expected %q. Got %q.", expected, got)
@@ -54,7 +53,7 @@ func TestGenerateInsertFromStruct(t *testing.T) {
 
 func TestSimpleDeleteFromStruct(t *testing.T) {
 	p := Person{1, "Chuck", 32}
-	expected := `delete from person where name="Chuck"`
+	expected := "delete from person where name=?"
 	got := Delete(p, []string{"Name"})
 	if expected != got {
 		t.Errorf(`DELETE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
@@ -63,7 +62,7 @@ func TestSimpleDeleteFromStruct(t *testing.T) {
 
 func TestMultipleFilterDeleteFromStruct(t *testing.T) {
 	p := Person{1, "Chuck", 32}
-	expected := `delete from person where name="Chuck" and age=32`
+	expected := "delete from person where name=? and age=?"
 	got := Delete(p, []string{"Name", "Age"})
 	if expected != got {
 		t.Errorf(`DELETE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
@@ -72,7 +71,7 @@ func TestMultipleFilterDeleteFromStruct(t *testing.T) {
 
 func TestGenerateUpdateFromStruct(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
-	expected := `update person set name="Umi", age=6 where id=1`
+	expected := "update person set name=?, age=? where id=?"
 	got := Update(p, []string{"name", "age"}, []string{"id"})
 
 	if expected != got {
@@ -82,7 +81,7 @@ func TestGenerateUpdateFromStruct(t *testing.T) {
 
 func TestMultipleFilterUpdateFromStructure(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
-	expected := `update person set age=6 where id=1 and name="Umi"`
+	expected := "update person set age=? where id=? and name=?"
 	got := Update(p, []string{"age"}, []string{"id", "name"})
 
 	if expected != got {
