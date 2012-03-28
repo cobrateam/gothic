@@ -4,7 +4,7 @@
 
 /*
 
-	Package sqlgen is used for SQL generation. It provides functions that
+	Package sqlgen provides functions for SQL generation. Its functions
 	generates insert's, update's, delete's and select's from struct
 	instances. It does not generate ready-to-run SQLs, but prepared
 	statements.
