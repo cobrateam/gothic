@@ -64,7 +64,7 @@ func Update(obj interface{}, uFields, fFields []string) string {
 	return sql
 }
 
-// Receives a slice of fields an returns a slice with fields in the
+// preparedFields receives a slice of fields an returns a slice with fields in the
 // form of field=? that represents a placeholder to be replace for a value
 func preparedFields(fields []string) []string {
 	preparedFields := make([]string, len(fields))
