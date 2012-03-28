@@ -88,7 +88,7 @@ func TestSelectReturnsErrorWhenOneFieldIsNotInTheStruct(t *testing.T) {
 	}
 }
 
-func TestGenerateInsertFromStructPointer(t *testing.T) {
+func TestInsertFromStructPointer(t *testing.T) {
 	var p Person
 	expected := "insert into person (id, name, age) values (?, ?, ?)"
 	got, _ := Insert(&p)
@@ -97,7 +97,7 @@ func TestGenerateInsertFromStructPointer(t *testing.T) {
 	}
 }
 
-func TestGenerateInsertFromStructValue(t *testing.T) {
+func TestInsertFromStructValue(t *testing.T) {
 	var p Person
 	expected := "insert into person (id, name, age) values (?, ?, ?)"
 	got, _ := Insert(p)
@@ -132,7 +132,7 @@ func TestMultipleFilterDeleteFromStruct(t *testing.T) {
 	}
 }
 
-func TestGenerateUpdateFromStruct(t *testing.T) {
+func TestUpdateFromStruct(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
 	expected := "update person set name=?, age=? where id=?"
 	got := Update(&p, []string{"name", "age"}, []string{"id"})
