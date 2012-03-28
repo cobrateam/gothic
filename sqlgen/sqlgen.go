@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+// Select generates a SELECT statement, selecting only "fields" from
+// the table given by the name of the struct "obj" lowercased. If the type
+// of obj is not a struct, the method returns an empty string and an error.
+// Otherwise it returns the SQL instruction and a nil error.
 func Select(obj interface{}, fields ...string) (string, error) {
 	var sql string
 
