@@ -20,13 +20,10 @@ import (
 //
 // Otherwise it returns the SQL instruction and a nil error.
 func Select(obj interface{}, fields ...string) (string, error) {
-	var sql string
-
 	t, err := checkType(obj)
 	if err != nil {
 		return "", err
 	}
-
 	if len(fields) == 0 {
 		fields = fieldNames(t)
 	} else {
@@ -36,7 +33,7 @@ func Select(obj interface{}, fields ...string) (string, error) {
 		}
 	}
 
-	sql = fmt.Sprintf("select %s from %s", strings.Join(fields, ", "), strings.ToLower(t.Name()))
+	sql := fmt.Sprintf("select %s from %s", strings.Join(fields, ", "), strings.ToLower(t.Name()))
 	return sql, nil
 }
 
@@ -55,7 +52,6 @@ func Insert(obj interface{}) (string, error) {
 	for i := 0; i < len(qm); i++ {
 		qm[i] = "?"
 	}
-
 	sql := fmt.Sprintf("insert into %s (%s) values (%s)", strings.ToLower(t.Name()), strings.Join(fields, ", "), strings.Join(qm, ", "))
 	return sql, nil
 }
@@ -92,7 +88,6 @@ func Update(obj interface{}, updateFields, filterFields []string) (string, error
 
 	fieldsAndValues := preparedFields(updateFields)
 	filters := preparedFields(filterFields)
-
 	sql := fmt.Sprintf("update %s set %s where %s", strings.ToLower(t.Name()), strings.Join(fieldsAndValues, ", "), strings.Join(filters, " and "))
 	return sql, nil
 }
