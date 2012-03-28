@@ -37,7 +37,7 @@ func Select(obj interface{}, fields ...string) (string, error) {
 	return sql, nil
 }
 
-// Insert generates a INSERT statement, using all values for the members of
+// Insert generates an INSERT statement, using all values for the members of
 // obj. If obj is not a struct nor a pointer to a struct, this method returns
 // an empty string and an error. Otherwise, it returns the SQL instruction and
 // a nil error.
