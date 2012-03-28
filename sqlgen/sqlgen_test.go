@@ -132,23 +132,62 @@ func TestMultipleFilterDeleteFromStruct(t *testing.T) {
 	}
 }
 
-func TestUpdateFromStruct(t *testing.T) {
+func TestUpdateFromStructPointer(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
 	expected := "update person set name=?, age=? where id=?"
-	got := Update(&p, []string{"name", "age"}, []string{"id"})
+	got, _ := Update(&p, []string{"name", "age"}, []string{"id"})
 
 	if expected != got {
 		t.Errorf(`UPDATE generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
-func TestMultipleFilterUpdateFromStructure(t *testing.T) {
+func TestUpdateFromStructValue(t *testing.T) {
 	p := Person{Id: 1, Name: "Umi", Age: 6}
-	expected := "update person set age=? where id=? and name=?"
-	got := Update(&p, []string{"age"}, []string{"id", "name"})
+	expected := "update person set name=?, age=? where id=?"
+	got, _ := Update(p, []string{"name", "age"}, []string{"id"})
 
 	if expected != got {
 		t.Errorf(`UPDATE generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+	}
+}
+
+func TestMultipleFilterUpdateFromStruct(t *testing.T) {
+	p := Person{Id: 1, Name: "Umi", Age: 6}
+	expected := "update person set age=? where id=? and name=?"
+	got, _ := Update(&p, []string{"age"}, []string{"id", "name"})
+
+	if expected != got {
+		t.Errorf(`UPDATE generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+	}
+}
+
+func TestUpdateReturnErrorIfTheGivenObjectIsNotAStruct(t *testing.T) {
+	i := 10
+	_, err := Update(i, []string{"name", "age"}, []string{"id"})
+
+	if err == nil || !strings.Contains(err.Error(), "provide a struct") {
+		t.Errorf("UPDATE generation: should return an error when obj is not a struct")
+	}
+}
+
+func TestUpdateReturnErrorIfOneOfTheUpdateFieldsIsNotMemberOfObj(t *testing.T) {
+	p := Person{Id: 1, Name: "Umi", Age: 6}
+	p.Age++
+	_, err := Update(p, []string{"age", "weight"}, []string{"id"})
+
+	if err == nil || !strings.Contains(err.Error(), `Person does not have a field called "weight"`) {
+		t.Errorf("UPDATE generation: should return an error when one or more of the update fields is not member of the given struct")
+	}
+}
+
+func TestUpdateReturnErrorIfOneOfTheFilterFieldsIsNotMemberOfObj(t *testing.T) {
+	p := Person{Id: 1, Name: "Umi", Age: 6}
+	p.Age++
+	_, err := Update(p, []string{"age"}, []string{"weight"})
+
+	if err == nil || !strings.Contains(err.Error(), `Person does not have a field called "weight"`) {
+		t.Errorf("UPDATE generation: should return an error when one or more of the filter fields is not member of the given struct, %s")
 	}
 }
 
@@ -187,7 +226,7 @@ func TestCheckFieldPresenceReturnsNilIfAllFieldsAreMemberOfTheStruct(t *testing.
 	}
 }
 
-func TestCheckFieldPresenceReturnsAnErrorIfAtLeastOneOfTheFieldsIsNotAMemberOfTheStruct(t *testing.T) {
+func TestCheckFieldPresenceReturnsAnErrorIfAtLeastOneOfTheFieldsIsNotMemberOfTheStruct(t *testing.T) {
 	var p Person
 	err := checkPresenceOfFields(reflect.TypeOf(p), []string{"age", "school"})
 	if err == nil || !strings.Contains(err.Error(), `Person does not have a field called "school"`) {

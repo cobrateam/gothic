@@ -76,15 +76,25 @@ func Delete(obj interface{}, filters []string) string {
 // uFields are the fields that are gonna be update
 // fFields are the fields that are gonna be used as filter
 // to the where clause
-func Update(obj interface{}, uFields, fFields []string) string {
-	t := reflect.TypeOf(obj).Elem()
+func Update(obj interface{}, updateFields, filterFields []string) (string, error) {
+	t, err := checkType(obj)
+	if err != nil {
+		return "", err
+	}
+	err = checkPresenceOfFields(t, updateFields)
+	if err != nil {
+		return "", err
+	}
+	err = checkPresenceOfFields(t, filterFields)
+	if err != nil {
+		return "", err
+	}
 
-	fieldsAndValues := preparedFields(uFields)
-	filters := preparedFields(fFields)
+	fieldsAndValues := preparedFields(updateFields)
+	filters := preparedFields(filterFields)
 
 	sql := fmt.Sprintf("update %s set %s where %s", strings.ToLower(t.Name()), strings.Join(fieldsAndValues, ", "), strings.Join(filters, " and "))
-
-	return sql
+	return sql, nil
 }
 
 func checkPresenceOfFields(t reflect.Type, fields []string) error {
