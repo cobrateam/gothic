@@ -10,17 +10,17 @@ import (
 	"strings"
 )
 
-func Select(obj interface{}, args ...[]string) string {
+func Select(obj interface{}, fields ...string) (sql string) {
 	t := reflect.TypeOf(obj).Elem()
-	var sql string
+	var names []string
 
-	if len(args) != 0 {
-		sql = fmt.Sprintf("select %s from %s", strings.Join(args[0], ", "), t.Name())
+	if len(fields) != 0 {
+		names = fields
 	} else {
-		fieldNames := fieldNames(t)
-		sql = fmt.Sprintf("select %s from %s", strings.Join(fieldNames, ", "), t.Name())
+		names = fieldNames(t)
 	}
 
+	sql = fmt.Sprintf("select %s from %s", strings.Join(names, ", "), t.Name())
 	return strings.ToLower(sql)
 }
 

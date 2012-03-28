@@ -45,7 +45,17 @@ func TestGenerateSelectAllFieldsFromStruct(t *testing.T) {
 func TestSelectOneFieldFromStruct(t *testing.T) {
 	var p Person
 	expected := "select name from person"
-	got := Select(&p, []string{"name"})
+	got := Select(&p, "name")
+
+	if expected != got {
+		t.Errorf(`SELECT generation for %q. Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
+	}
+}
+
+func TestSelectMultipleFieldsFromStruct(t *testing.T) {
+	var p Person
+	expected := "select age, name from person"
+	got := Select(&p, "age", "name")
 
 	if expected != got {
 		t.Errorf(`SELECT generation for %q. Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
