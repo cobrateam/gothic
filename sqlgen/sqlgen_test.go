@@ -39,7 +39,7 @@ func TestSelectAllFieldsFromStruct(t *testing.T) {
 	expected := "select id, name, age from person"
 	got, _ := Select(&p)
 	if expected != got {
-		t.Errorf(`SELECT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`SELECT generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -49,7 +49,7 @@ func TestSelectOneFieldFromStruct(t *testing.T) {
 	got, _ := Select(&p, "name")
 
 	if expected != got {
-		t.Errorf(`SELECT generation for %q. Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`SELECT generation for %q: Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -59,7 +59,7 @@ func TestSelectMultipleFieldsFromStruct(t *testing.T) {
 	got, _ := Select(&p, "age", "name")
 
 	if expected != got {
-		t.Errorf(`SELECT generation for %q. Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`SELECT generation for %q: Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -68,7 +68,7 @@ func TestSelectAcceptStructValue(t *testing.T) {
 	expected := "select id, name, age from person"
 	got, _ := Select(p)
 	if expected != got {
-		t.Errorf(`SELECT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`SELECT generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -76,7 +76,7 @@ func TestSelectReturnsErrorWhenObjectIsNotAStructNorAPointerToAStruct(t *testing
 	i := 10
 	_, err := Select(i)
 	if err == nil || !strings.Contains(err.Error(), "provide a struct") {
-		t.Errorf("Select should not accept non-struct values/pointers")
+		t.Errorf("SELECT generation: should not accept non-struct values/pointers")
 	}
 }
 
@@ -84,7 +84,7 @@ func TestSelectReturnsErrorWhenOneFieldIsNotInTheStruct(t *testing.T) {
 	var p Person
 	_, err := Select(p, "name", "weight")
 	if err == nil || !strings.Contains(err.Error(), `Person does not have a field called "weight"`) {
-		t.Errorf("Select should return error when selecting fields not present in the struct %q", err)
+		t.Errorf("SELECT generation: should return error when selecting fields not present in the struct %q", err)
 	}
 }
 
@@ -93,7 +93,7 @@ func TestInsertFromStructPointer(t *testing.T) {
 	expected := "insert into person (id, name, age) values (?, ?, ?)"
 	got, _ := Insert(&p)
 	if expected != got {
-		t.Errorf(`INSERT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`INSERT generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -102,7 +102,7 @@ func TestInsertFromStructValue(t *testing.T) {
 	expected := "insert into person (id, name, age) values (?, ?, ?)"
 	got, _ := Insert(p)
 	if expected != got {
-		t.Errorf(`INSERT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`INSERT generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -119,7 +119,7 @@ func TestSimpleDeleteFromStruct(t *testing.T) {
 	expected := "delete from person where name=?"
 	got := Delete(&p, []string{"Name"})
 	if expected != got {
-		t.Errorf(`DELETE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`DELETE generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -128,7 +128,7 @@ func TestMultipleFilterDeleteFromStruct(t *testing.T) {
 	expected := "delete from person where name=? and age=?"
 	got := Delete(&p, []string{"Name", "Age"})
 	if expected != got {
-		t.Errorf(`DELETE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`DELETE generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -138,7 +138,7 @@ func TestUpdateFromStruct(t *testing.T) {
 	got := Update(&p, []string{"name", "age"}, []string{"id"})
 
 	if expected != got {
-		t.Errorf(`UPDATE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`UPDATE generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
@@ -148,7 +148,7 @@ func TestMultipleFilterUpdateFromStructure(t *testing.T) {
 	got := Update(&p, []string{"age"}, []string{"id", "name"})
 
 	if expected != got {
-		t.Errorf(`UPDATE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+		t.Errorf(`UPDATE generation for %q: Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
 }
 
