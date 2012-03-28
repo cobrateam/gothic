@@ -11,14 +11,16 @@ import (
 	"strings"
 )
 
-// Select generates a SELECT statement, selecting only "fields" from
-// the table given by the name of the struct "obj" lowercased. If the type
-// of obj is not a struct, this method returns an empty string and an error.
+// Select generates a SELECT statement, selecting only "fields" (or all fields,
+// if "fields" is not given) from the table given by the name of the struct "obj"
+// lowercased. If the type of obj is not a struct, this method returns an empty
+// string and an error.
 //
 // If the type of obj is a struct, but one of the given fields is not a member
 // of the struct (lowercased), it returns an empty string and another error.
 //
-// Otherwise it returns the SQL instruction and a nil error.
+// Otherwise it returns the SQL instruction to be used in a prepared statement
+// and a nil error.
 func Select(obj interface{}, fields ...string) (string, error) {
 	t, err := checkType(obj)
 	if err != nil {
@@ -37,10 +39,10 @@ func Select(obj interface{}, fields ...string) (string, error) {
 	return sql, nil
 }
 
-// Insert generates an INSERT statement, using all values for the members of
-// obj. If obj is not a struct nor a pointer to a struct, this method returns
-// an empty string and an error. Otherwise, it returns the SQL instruction and
-// a nil error.
+// Insert generates an INSERT statement, using all values from members of obj.
+// If obj is not a struct nor a pointer to a struct, this function returns an
+// empty string and an error. Otherwise, it returns the SQL instruction to be
+// user in a prepared statement, and a nil error.
 func Insert(obj interface{}) (string, error) {
 	t, err := checkType(obj)
 	if err != nil {
@@ -85,8 +87,8 @@ func Delete(obj interface{}, filters []string) string {
 //
 // If the given object is not a struct, or one of the fields in the update
 // or filter list is not member of the given struct, this function returns
-// an empty string and an error. Otherwise, it returns the SQL for build a
-// prepared statement and nil error.
+// an empty string and an error. Otherwise, it returns the SQL to be used
+// in a prepared statement and nil error.
 func Update(obj interface{}, updateFields, filterFields []string) (string, error) {
 	t, err := checkType(obj)
 	if err != nil {
