@@ -21,7 +21,7 @@
 	this way:
 
 		var p Person
-		sql := sqlgen.Select(p)
+		sql, err := sqlgen.Select(p)
 
 	This would generate:
 
