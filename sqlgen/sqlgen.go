@@ -68,10 +68,25 @@ func Delete(obj interface{}, filters []string) string {
 	return sql
 }
 
-// obj is the struct to be updated in the database
-// uFields are the fields that are gonna be update
-// fFields are the fields that are gonna be used as filter
-// to the where clause
+// Update generates an UPDATE statement, using the given updateFields and
+// filterFields. updateFields contains a list of fields to include in the update
+// and filterFields contains a list of field to use in WHERE clause.
+//
+// The following code:
+//
+//		p := Person{Id: 10, Name: "Batman", Age: 90}
+//		sql, _ := Update(p, []string{"name"}, []string{"id"})
+//
+// will generate the following SQL:
+//
+//		update person set name = ? where id = ?
+//
+// Note that it generates just a string to build a prepared statement.
+//
+// If the given object is not a struct, or one of the fields in the update
+// or filter list is not member of the given struct, this function returns
+// an empty string and an error. Otherwise, it returns the SQL for build a
+// prepared statement and nil error.
 func Update(obj interface{}, updateFields, filterFields []string) (string, error) {
 	t, err := checkType(obj)
 	if err != nil {
