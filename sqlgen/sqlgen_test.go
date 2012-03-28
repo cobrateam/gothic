@@ -18,7 +18,7 @@ type Person struct {
 
 func TestFieldNames(t *testing.T) {
 	var p Person
-	expected := []string{"Id", "Name", "Age"}
+	expected := []string{"id", "name", "age"}
 	got := fieldNames(reflect.TypeOf(p))
 	if !reflect.DeepEqual(expected, got) {
 		t.Errorf("Expected %q. Got %q.", expected, got)
@@ -77,6 +77,14 @@ func TestSelectReturnsErrorWhenObjectIsNotAStructNorAPointerToAStruct(t *testing
 	_, err := Select(i)
 	if err == nil || !strings.Contains(err.Error(), "provide a struct") {
 		t.Errorf("Select should not accept non-struct values/pointers")
+	}
+}
+
+func TestSelectReturnsErrorWhenOneFieldIsNotInTheStruct(t *testing.T) {
+	var p Person
+	_, err := Select(p, "name", "weight")
+	if err == nil || !strings.Contains(err.Error(), `Person does not have a field called "weight"`) {
+		t.Errorf("Select should return error when selecting fields not present in the struct %q", err)
 	}
 }
 
@@ -151,5 +159,21 @@ func TestCheckTypeReturnsErrorWhenTheTypeIsNotAnStruct(t *testing.T) {
 
 	if err == nil || err.Error() != "Error generating SQL, you must provide a struct value or pointer" {
 		t.Errorf("Check type should accept only structs and pointers to structs")
+	}
+}
+
+func TestCheckFieldPresenceReturnsNilIfAllFieldsAreMemberOfTheStruct(t *testing.T) {
+	var p Person
+	err := checkPresenceOfFields(reflect.TypeOf(p), []string{"age", "name"})
+	if err != nil {
+		t.Errorf("Check presence of fields should return nil when all fields are present")
+	}
+}
+
+func TestCheckFieldPresenceReturnsAnErrorIfAtLeastOneOfTheFieldsIsNotAMemberOfTheStruct(t *testing.T) {
+	var p Person
+	err := checkPresenceOfFields(reflect.TypeOf(p), []string{"age", "school"})
+	if err == nil || !strings.Contains(err.Error(), `Person does not have a field called "school"`) {
+		t.Errorf("Check presence of field should return an error when one or more of the fields is not present")
 	}
 }

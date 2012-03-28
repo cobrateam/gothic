@@ -14,6 +14,10 @@ import (
 // Select generates a SELECT statement, selecting only "fields" from
 // the table given by the name of the struct "obj" lowercased. If the type
 // of obj is not a struct, the method returns an empty string and an error.
+//
+// If the type of obj is a struct, but one of the given fields is not a member
+// of the struct (lowercased), it returns an empty string and another error.
+//
 // Otherwise it returns the SQL instruction and a nil error.
 func Select(obj interface{}, fields ...string) (string, error) {
 	var sql string
@@ -25,6 +29,11 @@ func Select(obj interface{}, fields ...string) (string, error) {
 
 	if len(fields) == 0 {
 		fields = fieldNames(t)
+	} else {
+		err := checkPresenceOfFields(t, fields)
+		if err != nil {
+			return "", err
+		}
 	}
 
 	sql = fmt.Sprintf("select %s from %s", strings.Join(fields, ", "), t.Name())
@@ -71,6 +80,23 @@ func Update(obj interface{}, uFields, fFields []string) string {
 	return sql
 }
 
+func checkPresenceOfFields(t reflect.Type, fields []string) error {
+	names := fieldNames(t)
+	for _, givenName := range fields {
+		var found bool
+		for _, structName := range names {
+			if givenName == structName {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return fmt.Errorf(`%s does not have a field called "%s"`, t.Name(), givenName)
+		}
+	}
+	return nil
+}
+
 func checkType(obj interface{}) (reflect.Type, error) {
 	t := reflect.TypeOf(obj)
 	if t.Kind() == reflect.Ptr {
@@ -86,7 +112,7 @@ func fieldNames(t reflect.Type) []string {
 	fieldNames := make([]string, t.NumField())
 
 	for i := 0; i < t.NumField(); i++ {
-		fieldNames[i] = t.Field(i).Name
+		fieldNames[i] = strings.ToLower(t.Field(i).Name)
 	}
 
 	return fieldNames
