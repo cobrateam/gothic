@@ -5,23 +5,26 @@
 package sqlgen
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
 )
 
-func Select(obj interface{}, fields ...string) (sql string) {
-	t := reflect.TypeOf(obj).Elem()
-	var names []string
+func Select(obj interface{}, fields ...string) (string, error) {
+	var sql string
 
-	if len(fields) != 0 {
-		names = fields
-	} else {
-		names = fieldNames(t)
+	t, err := checkType(obj)
+	if err != nil {
+		return "", err
 	}
 
-	sql = fmt.Sprintf("select %s from %s", strings.Join(names, ", "), t.Name())
-	return strings.ToLower(sql)
+	if len(fields) == 0 {
+		fields = fieldNames(t)
+	}
+
+	sql = fmt.Sprintf("select %s from %s", strings.Join(fields, ", "), t.Name())
+	return strings.ToLower(sql), nil
 }
 
 func Insert(obj interface{}) string {
@@ -64,16 +67,15 @@ func Update(obj interface{}, uFields, fFields []string) string {
 	return sql
 }
 
-// preparedFields receives a slice of fields an returns a slice with fields in the
-// form of field=? that represents a placeholder to be replace for a value
-func preparedFields(fields []string) []string {
-	preparedFields := make([]string, len(fields))
-
-	for i, v := range fields {
-		preparedFields[i] = fmt.Sprintf(`%s=?`, strings.ToLower(v))
+func checkType(obj interface{}) (reflect.Type, error) {
+	t := reflect.TypeOf(obj)
+	if t.Kind() == reflect.Ptr {
+		t = t.Elem()
 	}
-
-	return preparedFields
+	if t.Kind() == reflect.Struct {
+		return t, nil
+	}
+	return nil, errors.New("Error generating SQL, you must provide a struct value or pointer")
 }
 
 func fieldNames(t reflect.Type) []string {
@@ -84,4 +86,16 @@ func fieldNames(t reflect.Type) []string {
 	}
 
 	return fieldNames
+}
+
+// preparedFields receives a slice of fields an returns a slice with fields in the
+// form of field=? that represents a placeholder to be replace for a value
+func preparedFields(fields []string) []string {
+	preparedFields := make([]string, len(fields))
+
+	for i, v := range fields {
+		preparedFields[i] = fmt.Sprintf(`%s=?`, strings.ToLower(v))
+	}
+
+	return preparedFields
 }

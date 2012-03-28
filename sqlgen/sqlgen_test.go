@@ -6,6 +6,7 @@ package sqlgen
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -33,10 +34,10 @@ func TestPrepraredFields(t *testing.T) {
 	}
 }
 
-func TestGenerateSelectAllFieldsFromStruct(t *testing.T) {
+func TestSelectAllFieldsFromStruct(t *testing.T) {
 	var p Person
 	expected := "select id, name, age from person"
-	got := Select(&p)
+	got, _ := Select(&p)
 	if expected != got {
 		t.Errorf(`SELECT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
 	}
@@ -45,7 +46,7 @@ func TestGenerateSelectAllFieldsFromStruct(t *testing.T) {
 func TestSelectOneFieldFromStruct(t *testing.T) {
 	var p Person
 	expected := "select name from person"
-	got := Select(&p, "name")
+	got, _ := Select(&p, "name")
 
 	if expected != got {
 		t.Errorf(`SELECT generation for %q. Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
@@ -55,10 +56,27 @@ func TestSelectOneFieldFromStruct(t *testing.T) {
 func TestSelectMultipleFieldsFromStruct(t *testing.T) {
 	var p Person
 	expected := "select age, name from person"
-	got := Select(&p, "age", "name")
+	got, _ := Select(&p, "age", "name")
 
 	if expected != got {
 		t.Errorf(`SELECT generation for %q. Was expecting "%s", got "%s".`, reflect.TypeOf(p), expected, got)
+	}
+}
+
+func TestSelectAcceptStructValue(t *testing.T) {
+	var p Person
+	expected := "select id, name, age from person"
+	got, _ := Select(p)
+	if expected != got {
+		t.Errorf(`SELECT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+	}
+}
+
+func TestSelectReturnsErrorWhenObjectIsNotAStructNorAPointerToAStruct(t *testing.T) {
+	i := 10
+	_, err := Select(i)
+	if err == nil || !strings.Contains(err.Error(), "provide a struct") {
+		t.Errorf("Select should not accept non-struct values/pointers")
 	}
 }
 
@@ -106,5 +124,32 @@ func TestMultipleFilterUpdateFromStructure(t *testing.T) {
 
 	if expected != got {
 		t.Errorf(`UPDATE generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+	}
+}
+
+func TestCheckTypeReturnsTheTypeForStructPointer(t *testing.T) {
+	var p = new(Person)
+	tp, _ := checkType(p)
+
+	if tp != reflect.TypeOf(*p) {
+		t.Errorf("Check type should accept struct pointer")
+	}
+}
+
+func TestCheckTypeReturnsTheTypeForStructValue(t *testing.T) {
+	var p Person
+	tp, _ := checkType(p)
+
+	if tp != reflect.TypeOf(p) {
+		t.Errorf("Check type should accept struct value")
+	}
+}
+
+func TestCheckTypeReturnsErrorWhenTheTypeIsNotAnStruct(t *testing.T) {
+	i := 10
+	_, err := checkType(i)
+
+	if err == nil || err.Error() != "Error generating SQL, you must provide a struct value or pointer" {
+		t.Errorf("Check type should accept only structs and pointers to structs")
 	}
 }
