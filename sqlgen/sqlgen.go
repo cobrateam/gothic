@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-func Select(obj interface{}, args...[]string) string {
+func Select(obj interface{}, args ...[]string) string {
 	t := reflect.TypeOf(obj).Elem()
 	var sql string
 
