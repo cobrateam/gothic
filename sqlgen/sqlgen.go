@@ -13,7 +13,7 @@ import (
 
 // Select generates a SELECT statement, selecting only "fields" from
 // the table given by the name of the struct "obj" lowercased. If the type
-// of obj is not a struct, the method returns an empty string and an error.
+// of obj is not a struct, this method returns an empty string and an error.
 //
 // If the type of obj is a struct, but one of the given fields is not a member
 // of the struct (lowercased), it returns an empty string and another error.
@@ -40,6 +40,10 @@ func Select(obj interface{}, fields ...string) (string, error) {
 	return sql, nil
 }
 
+// Insert generates a INSERT statement, using all values for the members of
+// obj. If obj is not a struct nor a pointer to a struct, this method returns
+// an empty string and an error. Otherwise, it returns the SQL instruction and
+// a nil error.
 func Insert(obj interface{}) (string, error) {
 	t, err := checkType(obj)
 	if err != nil {
