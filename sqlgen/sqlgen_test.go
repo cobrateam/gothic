@@ -88,12 +88,29 @@ func TestSelectReturnsErrorWhenOneFieldIsNotInTheStruct(t *testing.T) {
 	}
 }
 
-func TestGenerateInsertFromStruct(t *testing.T) {
+func TestGenerateInsertFromStructPointer(t *testing.T) {
 	var p Person
 	expected := "insert into person (id, name, age) values (?, ?, ?)"
-	got := Insert(&p)
+	got, _ := Insert(&p)
 	if expected != got {
 		t.Errorf(`INSERT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+	}
+}
+
+func TestGenerateInsertFromStructValue(t *testing.T) {
+	var p Person
+	expected := "insert into person (id, name, age) values (?, ?, ?)"
+	got, _ := Insert(p)
+	if expected != got {
+		t.Errorf(`INSERT generation for %q. Was expecting "%s", got %s.`, reflect.TypeOf(p), expected, got)
+	}
+}
+
+func TestInsertShouldReturnErrorWhenGivenObjectIsNotAStruct(t *testing.T) {
+	i := 10
+	_, err := Insert(i)
+	if err == nil || !strings.Contains(err.Error(), "provide a struct") {
+		t.Errorf("INSERT generation: should return error when the given type is not a struct")
 	}
 }
 

@@ -36,21 +36,24 @@ func Select(obj interface{}, fields ...string) (string, error) {
 		}
 	}
 
-	sql = fmt.Sprintf("select %s from %s", strings.Join(fields, ", "), t.Name())
-	return strings.ToLower(sql), nil
+	sql = fmt.Sprintf("select %s from %s", strings.Join(fields, ", "), strings.ToLower(t.Name()))
+	return sql, nil
 }
 
-func Insert(obj interface{}) string {
-	t := reflect.TypeOf(obj).Elem()
-	fieldNames := fieldNames(t)
+func Insert(obj interface{}) (string, error) {
+	t, err := checkType(obj)
+	if err != nil {
+		return "", err
+	}
 
-	qm := make([]string, len(fieldNames))
+	fields := fieldNames(t)
+	qm := make([]string, len(fields))
 	for i := 0; i < len(qm); i++ {
 		qm[i] = "?"
 	}
 
-	sql := fmt.Sprintf("insert into %s (%s) values (%s)", t.Name(), strings.Join(fieldNames, ", "), strings.Join(qm, ", "))
-	return strings.ToLower(sql)
+	sql := fmt.Sprintf("insert into %s (%s) values (%s)", strings.ToLower(t.Name()), strings.Join(fields, ", "), strings.Join(qm, ", "))
+	return sql, nil
 }
 
 func Delete(obj interface{}, filters []string) string {
